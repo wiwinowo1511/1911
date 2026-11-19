@@ -190,7 +190,7 @@ const CONFIG={
     "Vì anh iu mạnh mẽ",
     "Vì anh tốt bụng, dễ thương"
   ],
-  letter:"Anh ơi,\nLúc nào em cũng chỉ muốn gọi anh hai tiếng 'anh ơi' thui.\nCảm ơn anh vì đã đến, vì đã ở lại, và vì thương em. Nhân dịp ngày của anh em chúc anh iu luôn mạnh khỏe, ngày càng giỏi, đạt được nhiều thành công, vui vẻ và hạnh phúc (và ngày càng đẹp trai, cao to em iu). Em muốn cùng anh đi thật xa, thật lâu, qua thật nhiều mùa hoa nữa.\nBé yêu anh nhiều lắm."
+  letter:"Anh ơi,\nLúc nào em cũng chỉ muốn gọi anh hai tiếng 'anh ơi' thui.\nCảm ơn anh vì đã đến, vì đã ở lại, và thương em. Nhân dịp ngày của anh em chúc anh iu luôn mạnh khỏe, ngày càng giỏi, đạt được nhiều thành công, vui vẻ và hạnh phúc (và ngày càng đẹp trai, cao to em iu). Em muốn cùng anh đi thật xa, thật lâu, qua thật nhiều mùa hoa nữa.\nBé yêu anh nhiều lắm."
 };
 /* ================================ */
 const $=s=>document.querySelector(s),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -294,8 +294,10 @@ function buildGarden(){
  let gr=b.createRadialGradient(cx,cy,0,cx,cy,mx);gr.addColorStop(0,'#b9e6f8');gr.addColorStop(.2,'#8fd2ee');gr.addColorStop(.36,'#d2e68a');gr.addColorStop(.56,'#6fbb54');gr.addColorStop(.78,'#2f8c4c');gr.addColorStop(1,'#15513a');b.fillStyle=gr;b.fillRect(0,0,GW,GH);
  const pal=q=>pick(q<.16?['#e6f7ff','#bfe6f8','#9fd6f0','#fffbd0','#f1f0ff','#d8f0c0']:q<.4?['#f1ef9c','#d8ec8a','#b8e6a0','#a5dcee','#c9c2f2','#f6d2e6','#9be0c4']:q<.7?['#8fd462','#6cc878','#4fbf9a','#a6dc6a','#e9a4c8','#b5a8ec','#5fcad0','#cfe97a']:['#256f45','#3f9a50','#16573a','#86c862','#2f8d6a','#e8629a','#133f35','#5a8fd8']);
  const N=GW*GH/70|0;
+ b.filter='blur(1px)';
  for(let i=0;i<N;i++){const x=R()*GW,y=R()*GH,q=Math.hypot(x-cx,y-cy)/mx,s=(1.5-i/N)*u,l=(12+R()*22)*s,w=(3+R()*4.5)*s;
   b.save();b.translate(x,y);b.rotate(Math.atan2(y-cy,x-cx)+1.57+(R()-.5)*.7);b.globalAlpha=.55+R()*.4;b.fillStyle=pal(q);b.fillRect(-l/2,-w/2,l,w);b.restore()}
+ b.filter='none';
  b.globalCompositeOperation='screen';gr=b.createRadialGradient(cx,cy,0,cx,cy,mx*.45);gr.addColorStop(0,'rgba(255,248,200,.3)');gr.addColorStop(1,'rgba(255,248,200,0)');b.fillStyle=gr;b.fillRect(0,0,GW,GH);
  /* cành, lá, hoa hồng nền: mỗi cái lung lay theo gió riêng */
  spr=[];const add=(img,x,y,w,leaf,amp)=>spr.push({img,x,y,w,py:leaf?.96:.5,a:leaf?Math.atan2(x-cx,-(y-cy))+(R()-.5)*1.1:(R()-.5)*1.5,amp,ph:R()*6.3,sp:.6+R()*.8});
