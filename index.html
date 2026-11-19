@@ -380,7 +380,9 @@ function typeIt(){const t=CONFIG.letter,el=$('#txt'),p=$('#paper');let i=0;p.add
 
 const startButton=$('#start'),teaseScales=[1.12,.86,1.18,.92,1.06];let teaseCount=0,startRect;
 function dodgeStart(event){
- if(event.pointerType!=='mouse'||teaseCount>=teaseScales.length)return;
+ const isMouse=event.type==='pointerenter'&&event.pointerType==='mouse',isTouch=event.type==='pointerdown'&&event.pointerType==='touch';
+ if((!isMouse&&!isTouch)||teaseCount>=teaseScales.length)return;
+ if(isTouch)event.preventDefault();
  if(!startRect){
   startButton.classList.remove('beat');startRect=startButton.getBoundingClientRect();
   startButton.parentElement.style.width=startRect.width+'px';startButton.parentElement.style.height=startRect.height+'px';
@@ -399,6 +401,7 @@ function dodgeStart(event){
  if(teaseCount===teaseScales.length){startButton.textContent='iu em mới mở được!';startButton.removeEventListener('pointerenter',dodgeStart)}
 }
 startButton.addEventListener('pointerenter',dodgeStart);
+startButton.addEventListener('pointerdown',dodgeStart);
 startButton.onclick=()=>go(1);$('#to2').onclick=()=>go(2);$('#again').onclick=()=>location.reload();
 </script>
 </body>
