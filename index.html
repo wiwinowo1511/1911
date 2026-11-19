@@ -318,7 +318,7 @@ function buildGarden(){
  spr.sort((p,q)=>p.w-q.w);const movingCount=Math.min(24,spr.length);staticSpr=spr.slice(0,-movingCount);spr=spr.slice(-movingCount);
  FL=Array.from({length:32},()=>({x:R()*GW,y:R()*GH,r:(1+R()*3)*Math.max(.8,u),vy:-(.1+R()*.35),vx:.1+R()*.3,ph:R()*6,big:R()<.2}));
  BF=Array.from({length:2},(_,i)=>({p:i*1.9,s:.7+R()*.6,z:(.9+R()*.4)*Math.max(.8,u),c:i===0?'blue':'purple'}));
- vg=gx.createRadialGradient(GW/2,GH*.45,Math.min(GW,GH)*.35,GW/2,GH*.45,Math.hypot(GW,GH)*.55);vg.addColorStop(0,'rgba(8,48,42,0)');vg.addColorStop(1,'rgba(6,44,40,.45)');
+ vg=gx.createRadialGradient(GW/2,GH*.45,Math.min(GW,GH)*.35,GW/2,GH*.45,Math.hypot(GW,GH)*.55);vg.addColorStop(0,'rgba(8,48,42,0)');vg.addColorStop(1,'rgba(6,44,40,.32)');
 }
 addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(document.body.classList.contains('gx'))buildGarden()},300)});
 function bfly(o){
