@@ -199,8 +199,8 @@ const scenes=[...document.querySelectorAll('.scene')];
 function go(i){scenes.forEach((s,k)=>s.classList.toggle('on',k===i));if(i===1)setTimeout(()=>step(0),350);document.body.classList.toggle('gx',i===2);if(i===2){const title=$('#s2 h2');title.classList.remove('rise');void title.offsetWidth;title.classList.add('rise');buildGarden();pinkify();setTimeout(()=>$('#garden').classList.add('grow'),500)}}
 
 /* hạt: cánh hoa rơi + tim */
-const cv=$('#fx'),cx=cv.getContext('2d'),cols=['#e889a9','#f3b7c9','#fff0e0','#c97486','#ffcf9d'];let W,H,P=[];
-function rs(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+const cv=$('#fx'),cx=cv.getContext('2d'),cols=['#e889a9','#f3b7c9','#fff0e0','#c97486','#ffcf9d'];let W,H,P=[],resizeFrame;
+function rs(){W=innerWidth;H=innerHeight;if(resizeFrame)return;resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;const d=Math.min(devicePixelRatio||1,2);cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)})}
 addEventListener('resize',rs);rs();
 const R=Math.random,pick=a=>a[R()*a.length|0];
 const petal=top=>({t:'p',x:R()*W,y:top?-20:R()*H,vx:(R()-.5)*.4,vy:.3+R()*.6,r:5+R()*6,a:R()*6,va:(R()-.5)*.03,c:pick(cols),o:.35+R()*.4,sw:R()*6});
@@ -245,7 +245,7 @@ function pinkify(){cols.splice(0,cols.length,'#ffb8d1','#ffd6e4','#fff0f5','#f79
 
 /* --- nền: tranh sơn dầu vẽ bằng nét cọ xoáy quanh đường hầm hoa --- */
 const gc=$('#gd'),gx=gc.getContext('2d'),LC=[['#dced9e','#93d36d','#52b968','#438b5b'],['#c9e8ad','#79ca78','#48b284','#3c876f'],['#e4ed9e','#a5ce69','#5fb467','#478b46'],['#b6e8d0','#64c9a9','#43b69a','#387d74']];
-let GW,GH,base,spr=[],FL=[],BF=[],vg,T=0,last=0,rt;
+let GW,GH,GD,base,spr=[],FL=[],BF=[],vg,T=0,last=0,rt;
 const cv2=()=>{const c=document.createElement('canvas');return c};
 /* hồng kiểu tranh: [kem rìa cánh, hồng nhạt, hồng, đỏ hồng đậm ở tâm] */
 const PG=[['#fff2f4','#f9b0ca','#ee6c9d','#d03c74'],['#fffafa','#ffd0de','#f79fbd','#e2527f'],['#fff6e6','#ffd2b0','#fba088','#ec6a5c'],['#faf3ff','#dfcbf8','#bd98ea','#9266d0'],['#fffbe4','#ffeba0','#fccc6c','#f19a44'],['#fff0ee','#ffbcb8','#ff8296','#e24e6a']],
@@ -288,16 +288,16 @@ const RS=[0,1,2,3,4,5].map(mkRose),LS=LC.map(mkLeaf);
 $('svg defs').insertAdjacentHTML('beforeend',LS.map((c,v)=>'<symbol id="ls'+v+'" viewBox="0 0 160 160"><image href="'+c.toDataURL()+'" width="160" height="160"/></symbol>').join(''));
 $('svg defs').insertAdjacentHTML('beforeend',RS.map((c,v)=>'<symbol id="rs'+v+'" viewBox="0 0 100 100"><image href="'+c.toDataURL()+'" width="100" height="100"/></symbol>').join(''));
 function buildGarden(){
- const d=Math.min(devicePixelRatio||1,2);GW=innerWidth;GH=innerHeight;gc.width=GW*d;gc.height=GH*d;gx.setTransform(d,0,0,d,0,0);
+ const d=Math.min(devicePixelRatio||1,1.5),width=innerWidth,height=innerHeight;
+ if(base&&GW===width&&GH===height&&GD===d)return;
+ GW=width;GH=height;GD=d;gc.width=GW*d;gc.height=GH*d;gx.setTransform(d,0,0,d,0,0);
  base=cv2();base.width=GW*d;base.height=GH*d;const b=base.getContext('2d');b.scale(d,d);
  const cx=GW*.5,cy=GH*.38,mx=Math.hypot(GW*.5,GH*.62),u=Math.min(GW,GH*.75)/400;
  let gr=b.createRadialGradient(cx,cy,0,cx,cy,mx);gr.addColorStop(0,'#b9e6f8');gr.addColorStop(.2,'#8fd2ee');gr.addColorStop(.36,'#d2e68a');gr.addColorStop(.56,'#6fbb54');gr.addColorStop(.78,'#2f8c4c');gr.addColorStop(1,'#15513a');b.fillStyle=gr;b.fillRect(0,0,GW,GH);
  const pal=q=>pick(q<.16?['#e6f7ff','#bfe6f8','#9fd6f0','#fffbd0','#f1f0ff','#d8f0c0']:q<.4?['#f1ef9c','#d8ec8a','#b8e6a0','#a5dcee','#c9c2f2','#f6d2e6','#9be0c4']:q<.7?['#8fd462','#6cc878','#4fbf9a','#a6dc6a','#e9a4c8','#b5a8ec','#5fcad0','#cfe97a']:['#256f45','#3f9a50','#16573a','#86c862','#2f8d6a','#e8629a','#133f35','#5a8fd8']);
- const N=GW*GH/70|0;
- b.filter='blur(1px)';
+ const N=Math.min(8000,Math.ceil(GW*GH/260));
  for(let i=0;i<N;i++){const x=R()*GW,y=R()*GH,q=Math.hypot(x-cx,y-cy)/mx,s=(1.5-i/N)*u,l=(12+R()*22)*s,w=(3+R()*4.5)*s;
-  b.save();b.translate(x,y);b.rotate(Math.atan2(y-cy,x-cx)+1.57+(R()-.5)*.7);b.globalAlpha=.55+R()*.4;b.fillStyle=pal(q);b.fillRect(-l/2,-w/2,l,w);b.restore()}
- b.filter='none';
+  b.save();b.translate(x,y);b.rotate(Math.atan2(y-cy,x-cx)+1.57+(R()-.5)*.7);b.globalAlpha=.48+R()*.32;b.fillStyle=pal(q);b.fillRect(-l/2,-w/2,l,w);b.restore()}
  b.globalCompositeOperation='screen';gr=b.createRadialGradient(cx,cy,0,cx,cy,mx*.45);gr.addColorStop(0,'rgba(255,248,200,.3)');gr.addColorStop(1,'rgba(255,248,200,0)');b.fillStyle=gr;b.fillRect(0,0,GW,GH);
  /* cành, lá, hoa hồng nền: mỗi cái lung lay theo gió riêng */
  spr=[];const add=(img,x,y,w,leaf,amp)=>spr.push({img,x,y,w,py:leaf?.96:.5,a:leaf?Math.atan2(x-cx,-(y-cy))+(R()-.5)*1.1:(R()-.5)*1.5,amp,ph:R()*6.3,sp:.6+R()*.8});
@@ -311,7 +311,7 @@ function buildGarden(){
  BF=Array.from({length:5},(_,i)=>({p:i*1.9,s:.7+R()*.6,z:(.9+R()*.4)*Math.max(.8,u),c:i===0?'blue':i===1?'purple':'pink'}));
  vg=gx.createRadialGradient(GW/2,GH*.45,Math.min(GW,GH)*.35,GW/2,GH*.45,Math.hypot(GW,GH)*.55);vg.addColorStop(0,'rgba(8,48,42,0)');vg.addColorStop(1,'rgba(6,44,40,.45)');
 }
-addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(base)buildGarden()},200)});
+addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(document.body.classList.contains('gx'))buildGarden()},300)});
 function bfly(o){
  const flap=.48+Math.abs(Math.sin(T*8+o.p))*.52,x=GW*(.5+.42*Math.sin(T*.22*o.s+o.p)),y=GH*(.34+.22*Math.sin(T*.37*o.s+o.p*2)),z=o.z*.36;
  const C=o.c==='blue'?{glow:'210,236,255',glow2:'178,218,255',edge:['#c9e5f8','#a9d4f2','#98c9ed'],inner:['#f3fbff','#e0f2ff','#d2eafa'],low:['#bfdff6','#a5d1f0'],lowIn:['#f1faff','#d9edfb'],vein:'rgba(112,163,202,.4)',spot:'rgba(202,229,249,.9)'}:o.c==='purple'?{glow:'239,222,255',glow2:'216,194,248',edge:['#dfcff5','#cbb8eb','#b9a4de'],inner:['#fff5ff','#f0e6fb','#e6dcf7'],low:['#d8c9f1','#c1afe7'],lowIn:['#fff4ff','#e9def8'],vein:'rgba(157,133,192,.4)',spot:'rgba(228,213,249,.95)'}:{glow:'255,235,246',glow2:'222,210,255',edge:['#f6c2d0','#e9adc8','#d6a6d1'],inner:['#fff5df','#fce9d2','#f6d5e5'],low:['#f4c1ce','#dca8ca'],lowIn:['#fff3df','#f3d9eb'],vein:'rgba(190,145,179,.42)',spot:'rgba(224,171,203,.76)'};
